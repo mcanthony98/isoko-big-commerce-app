@@ -41,7 +41,7 @@
 <!-- Automatic element centering -->
 <div class="lockscreen-wrapper shadow-sm bg-white" style="padding:20px 0px">
   <div class="lockscreen-logo">
-    <a href="index.php"><img src="img/isoko4.jpg" style="max-width:200px"></a>
+    <a href="index.php"><img src="img/isoko4.JPG" style="max-width:200px"></a>
   </div><!-- /.lockscreen-item -->
   <div class="help-block text-center">
     Enter your <a class="text-orange" href="index.php">I-Soko</a> password to enter Admin Panel<br/>
