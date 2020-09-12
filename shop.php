@@ -490,15 +490,108 @@
 						  </dd>
 						</dl>
 						  <h5 class="text-center product-cover"><b>Shop Policy</b></h5>
+						  <?php
+							// processing Time
+							$proctimeres = $pdo->query("SELECT * FROM processing_time WHERE shop_id = '$shid'");
+							if($proctimeres->num_rows == 0){
+								$proctime = "";
+							}else{
+								$proctimerow = $proctimeres->fetch_assoc();
+								if($proctimerow["days"] == 1){
+									$proctime =  '<dt class="col-md-2">Processing time</dt>
+											<dd class="col-md-9">Orders are ready for delivery within 24Hrs.<hr/></dd>';
+								}else{
+									$proctime =  '<dt class="col-md-2">Processing time</dt>
+											<dd class="col-md-9">Orders take '.$proctimerow["days"].' business days to process before they are ready for delivery.<hr/></dd>';
+								}
+								
+							}
+							
+							// delivery cost
+							$delcos ="";
+							if($row["offers_free_delivery"] == 1){
+								$delcos .= 'We offer <b>Free Delivery</b> to all towns in Kenya';
+							}else{
+								$delres =$pdo->query("SELECT * FROM shop_delivery WHERE shop_id='$shid'");
+								if($delres->num_rows == 0){
+									$delcos .= '<span class="text-secondary">! This seller has not set any Delivery options. You can contact seller for information.</span>';
+								}else{
+									$delcos .= '<dl class="row">';
+									while($delrow = $delres->fetch_assoc()){
+										$countyres = $pdo->query("SELECT * FROM county WHERE county_id=".$delrow["county_id"]);
+										$countyrow = $countyres->fetch_assoc();
+										$decost = "Ksh ".$delrow["cost"];
+										if($delrow["cost"] == 0){
+											$decost = '<span class="badge badge-info px-2">FREE  </span>';
+										}
+										$delcos .= '
+											  <dd class="col-4">'.$countyrow["county_name"].'</dd>
+											  <dd class="col-8">'.$decost.'</dd>
+										';
+									}
+									$delcos .= '</dl>';
+								}
+							}
+							$delinfores = $pdo->query("SELECT * FROM shop_info WHERE shop_id='$shid'");
+							$delinforow = $delinfores->fetch_assoc();
+							
+							
+							// pick up 
+							$pickuptxt = "";
+							if($row["has_pickup"] == 0){
+								$pickuptxt = "We do not offer order-pickup services";
+							}else{
+								$shoppicres = $pdo->query("SELECT * FROM shop_pickup WHERE shop_id = '$shid'");
+								if($shoppicres->num_rows == 0){
+									$pickuptxt = '<span class="text-secondary">This seller has no pickup stations set. Contact this seller in the mail box for any inquiry</span>';
+								}else {
+									$pickuptxt .= 'Below are our pick up stations. You can always send a message in the mailbox if you wish more directions.';
+									$pickuptxt .= '<dl class="row mt-2 mx-auto text-secondary ">';
+									$pickuptxt .= '<dt class="col-8 my-1">Location</dt><dt class="col-4 my-1">Cost</dt>';
+									
+									while($shoppicrow = $shoppicres->fetch_assoc()){
+										$countyres = $pdo->query('SELECT * FROM county WHERE county_id='.$shoppicrow["county_id"]);
+										$countyrow = $countyres->fetch_assoc();
+										$cityres = $pdo->query('SELECT * FROM city WHERE city_id='.$shoppicrow["city_id"]);
+										$cityrow = $cityres->fetch_assoc();
+										$pcost = "Ksh ".$shoppicrow["cost"];
+										if($shoppicrow["cost"] == 0){
+											$pcost = '<span class="badge badge-info px-2">FREE  </span>';
+										}
+										$pickuptxt .= '
+											  <dd class="col-8 mb-1 border-top">'.$shoppicrow["location"].', '.$cityrow["city_name"].' - '.$countyrow["county_name"].' <br/> <small>Open between '.$shoppicrow["open_time"].' - '.$shoppicrow["close_time"].'</small></dd>
+											  <dd class="col-4 mb-1 border-top">'.$pcost.'</dd>
+										';
+										
+									
+									}
+									$pickuptxt .= '</dl>';
+								}
+							}
+							
+							// returns policy
+							if($row["accept_returns"] == NULL){
+								$returntxt = '<span class="text-secondary">This seller has not set any returns policy. In case of a problem, send a message to this seller in the mailbox. Thank You.</span>';
+							}elseif($row["accept_returns"] == 0){
+								$returntxt = '<span class="text-danger">We do not accept returns. In case of a problem, send us a message in the mailbox. Thank You.</span>';
+							}elseif($row["accept_returns"] == 1){
+								$returntxt = '<span class="text-success">We accept returns on orders. In case of a problem, send us a message in the mailbox. Thank You.</span>';
+							}elseif($row["accept_returns"] == 2){
+								$returntxt = '<span>We do accept returns <b>Only on selected items</b>. Please check the product description for details.</span>';
+							}
+							
+						  ?>
 						<dl class="row">
-						  <dt class="col-md-2">Delivery time</dt>
-						  <dd class="col-md-9">Deliveries are made within 2 Business Days within Nairobi and upto 6 Business Days to upcountry. </dd>
+							<?php echo $proctime;?>
 						  <dt class="col-md-2">Delivery Cost</dt>
-						  <dd class="col-md-9">Delivery is free within Nairobi CBD. Fixed rate of Ksh 200, for places outside Nairobi.</dd>
+						  <dd class="col-md-9"><?php echo $delcos;?></dd>
+						  <dd class="col-md-9 offset-sm-2"><?php echo $delinforow["delivery_info"];?><hr/></dd>
 						  <dt class="col-md-2">Pick-Up</dt>
-						  <dd class="col-md-9">Orders can be picked directly at Nairobi/ Rahimtula 2nd Floor, Moi Avenue. Delivery Cost will not be charged.</dd>
+						  <dd class="col-md-9"><?php echo $pickuptxt;?></dd>
+						  <dd class="col-md-9 offset-sm-2"><?php echo $delinforow["pickup_info"];?><hr/></dd>
 						  <dt class="col-md-2">Returns</dt>
-						  <dd class="col-md-9">Varries with Items. Check Product description for details. Returns are only accepted within 2days after purchase.</dd>
+						  <dd class="col-md-9"><?php echo $returntxt;?></dd>
+						  <dd class="col-md-9 offset-sm-2"><?php echo $delinforow["return_info"];?></dd>
 						</dl>
 					</div>
                 </div>
@@ -575,7 +668,7 @@
 						<div class="col-xl-2 col-md-3 col-sm-4 col-6">
 								<a href="product.php?product=<?php echo $commrow["product_id"];?>" >
 								  <img src="<?php echo $prodimg;?>" class="img-fluid mb-2 border" style="height:150px" alt="<?php echo $prodcomrow["name"];?>"/>
-								  <div class="row text-dark borde">
+								  <div class="row text-dark">
 									<div style="font-size:14px" class="col-12 text-secondary"><?php echo $prodcomrow["name"];?></div>
 								  </div>
 								</a>
@@ -668,7 +761,7 @@ function scrollFunction() {
   if (document.body.scrollTop > 230 || document.documentElement.scrollTop > 230) {
     document.getElementById("navbar").style.top = "0";
   } else {
-    document.getElementById("navbar").style.top = "-50px";
+    document.getElementById("navbar").style.top = "-100px";
   }
 }
 </script>

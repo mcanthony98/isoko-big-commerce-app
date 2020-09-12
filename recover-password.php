@@ -21,7 +21,7 @@
  <div class="bg-white" align="center">
 <div class="login-box shadow" style="margin:30px 0px;">
   <div class="login-logo">
-    <a href="index.php"><img src="img/isoko4.JPG" style="max-width:100px"></a>
+    <a href="index.php"><img src="img/isoko4.jpg" style="max-width:100px"></a>
   </div>
   <!-- /.login-logo -->
    <div class="card">

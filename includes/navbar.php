@@ -25,7 +25,7 @@
     <div class="container-fluid">
       
 	  <a href="index.php" class="navbar-brand">
-        <img src="img/isoko4.JPG" alt="isoko Logo" class="brand-image" >
+        <img src="img/isoko4.jpg" alt="isoko Logo" class="brand-image" >
       </a>
 	  
      <!-- SEARCH FORM -->
